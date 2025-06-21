@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Send, Github, Linkedin, ExternalLink, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Github, Linkedin, CheckCircle, AlertCircle } from 'lucide-react';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +9,16 @@ const Contact = () => {
     message: ''
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
+  // Replace with your Google Apps Script Web App URL
+  
+  const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL || '';
+  if (!scriptUrl) {
+    console.error('Google Apps Script URL is not defined. Please set REACT_APP_GOOGLE_SCRIPT_URL in your .env file.');
+    return null; // or handle this case appropriately
+  }
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
@@ -17,12 +26,79 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate form submission
-    setIsSubmitted(true);
-    setTimeout(() => setIsSubmitted(false), 3000);
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    try {
+      // Create form data to send
+      const formPayload = new URLSearchParams();
+      formPayload.append('name', formData.name);
+      formPayload.append('email', formData.email);
+      formPayload.append('subject', formData.subject);
+      formPayload.append('message', formData.message);
+      formPayload.append('timestamp', new Date().toISOString());
+
+      // First try POST request
+      let response;
+      try {
+        console.log('Attempting POST request to:', scriptUrl);
+        response = await fetch(scriptUrl, {
+          method: 'POST',
+          body: formPayload,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        });
+        console.log('POST response status:', response.status);
+      } catch (postError) {
+        console.log('POST failed, trying GET', postError);
+        // If POST fails, try GET as fallback
+        const getUrl = `${scriptUrl}?name=${encodeURIComponent(formData.name)}&email=${encodeURIComponent(formData.email)}&subject=${encodeURIComponent(formData.subject)}&message=${encodeURIComponent(formData.message)}`;
+        console.log('Attempting GET request to:', getUrl);
+        response = await fetch(getUrl, {
+          method: 'GET',
+          mode: 'no-cors',
+        });
+        
+        // With no-cors mode we can't check response status, so we'll assume success
+        setIsSubmitted(true);
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        return;
+      }
+
+      // Check if response is ok (status 200-299)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Try to parse JSON response
+      let result;
+      try {
+        result = await response.json();
+        console.log('Response from server:', result);
+      } catch (parseError) {
+        console.error('Error parsing response:', parseError);
+        throw new Error('Invalid response from server');
+      }
+
+      if (result.result === 'success') {
+        setIsSubmitted(true);
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        throw new Error(result.error || 'Failed to submit form');
+      }
+    } catch (error: unknown) {
+      console.error('Error submitting form:', error);
+      let errorMessage = 'Failed to submit form. Please try again later.';
+      if (error instanceof Error) {
+        errorMessage = `Failed to submit form. ${error.message}`;
+      }
+      setSubmitError(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -43,7 +119,7 @@ const Contact = () => {
     {
       icon: MapPin,
       title: "Location",
-      content: "India",
+      content: "delhi , India",
       link: "#",
       color: "from-orange-500 to-red-500"
     }
@@ -155,6 +231,13 @@ const Contact = () => {
               </div>
             )}
 
+            {submitError && (
+              <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center">
+                <AlertCircle size={20} className="text-red-400 mr-3" />
+                <span className="text-red-100">{submitError}</span>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
@@ -211,10 +294,20 @@ const Contact = () => {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 px-8 rounded-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 px-8 rounded-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-70"
               >
-                <span>Send Message</span>
-                <Send size={20} />
+                {isSubmitting ? (
+                  <>
+                    <span>Sending...</span>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  </>
+                ) : (
+                  <>
+                    <span>Send Message</span>
+                    <Send size={20} />
+                  </>
+                )}
               </button>
             </form>
           </div>

@@ -13,12 +13,8 @@ const Contact = () => {
   const [submitError, setSubmitError] = useState('');
 
   // Replace with your Google Apps Script Web App URL
-  
-  const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL || '';
-  if (!scriptUrl) {
-    console.error('Google Apps Script URL is not defined. Please set REACT_APP_GOOGLE_SCRIPT_URL in your .env file.');
-    return null; // or handle this case appropriately
-  }
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycbyihpyh--ElfReICzlsZoDUp3Nw0SaifiqGQoFf-Nx2y9_EfxcjmCTu4GfDSdeJLyOC/exec';
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,

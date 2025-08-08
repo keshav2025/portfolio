@@ -105,7 +105,7 @@ const Hero = () => {
               </h1>
             </motion.div>
 
-            {/* Title with Floating Badge */}
+           
             <motion.h2 
               variants={itemVariants}
               className="text-xl sm:text-2xl md:text-3xl font-medium mb-6"
@@ -118,7 +118,7 @@ const Hero = () => {
               </motion.span>
             </motion.h2>
 
-            {/* Description with 3D Card Effect */}
+            
             <motion.p 
               variants={itemVariants}
               className="text-base sm:text-lg md:text-xl mb-8 text-gray-300 leading-relaxed p-6 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700/50"
@@ -130,7 +130,7 @@ const Hero = () => {
               Computer Science student at Polaris School of Technology, passionate about creating innovative web and mobile applications with modern technologies.
             </motion.p>
 
-            {/* 3D Buttons with Depth Effect */}
+            
             <motion.div 
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-4 mb-10"
@@ -161,7 +161,7 @@ const Hero = () => {
               </motion.button>
             </motion.div>
 
-            {/* 3D Social Links */}
+            
             <motion.div 
               variants={itemVariants}
               className="flex gap-4"
@@ -195,11 +195,11 @@ const Hero = () => {
               className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96"
               whileHover={{ scale: 1.02 }}
             >
-              {/* 3D Layered Effect */}
+             
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-full shadow-2xl transform rotate-3"></div>
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-full shadow-2xl transform -rotate-3"></div>
               
-              {/* Main Profile Image */}
+             
               <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-white/10 bg-gray-800/50 backdrop-blur-sm">
                 <img 
                   src="/mydp.jpeg" 
@@ -209,7 +209,7 @@ const Hero = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/50 via-transparent to-transparent"></div>
               </div>
               
-              {/* Floating Tech Icons */}
+              
               <motion.div 
                 className="absolute -top-4 -right-4 w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full shadow-lg flex items-center justify-center text-white"
                 animate={{

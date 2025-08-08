@@ -244,7 +244,7 @@ const Hero = () => {
           </motion.div>
         </motion.div>
 
-        {/* 3D Scroll Down Indicator */}
+
         <motion.div 
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
           initial={{ opacity: 0, y: 20 }}
